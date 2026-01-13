@@ -43,7 +43,7 @@ fn main() -> Result<(), Box<dyn Error>> {
                         no_date: false,
                         no_seconds: false,
                         millis: false,
-                        format_date: "%Y-%m-%d".to_string(),
+                        format_date: None,
                     }),
                     KeyCode::Char('w') => app.set_mode(Mode::Stopwatch),
                     KeyCode::Char('t') => app.set_mode(Mode::Timer {

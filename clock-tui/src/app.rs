@@ -32,7 +32,7 @@ pub enum Mode {
         timezone: Option<Tz>,
         /// Custom date format, for example "%a, %d %b %Y", defaults to "%Y-%m-%d"
         #[clap(short = 'f', long)]
-        format_date: String,
+        format_date: Option<String>,
         /// Do not show date
         #[clap(short = 'D', long, action)]
         no_date: bool,
@@ -182,7 +182,7 @@ impl App {
                         millis: clock_config.map(|c| c.show_millis).unwrap_or(false),
                         no_seconds: !clock_config.map(|c| c.show_seconds).unwrap_or(true),
                         timezone: clock_config.and_then(|c| c.timezone),
-                        format_date: clock_config.map(|c| c.format_date.clone()).unwrap_or("%Y-%m-%d".to_string()),
+                        format_date: clock_config.and_then(|c| c.format_date.clone()),
                     }
                 }
             });
@@ -207,7 +207,7 @@ impl App {
             millis: false,
             no_seconds: false,
             timezone: None,
-            format_date: "%Y-%m-%d".to_string(),
+            format_date: Some("%Y-%m-%d".to_string()),
         }) {
             Mode::Clock {
                 no_date,
@@ -224,7 +224,7 @@ impl App {
                     show_millis: *millis || clock_config.map(|c| c.show_millis).unwrap_or(false),
                     show_secs: !no_seconds && clock_config.map(|c| c.show_seconds).unwrap_or(true),
                     timezone: timezone.or_else(|| clock_config.and_then(|c| c.timezone)),
-                    format_date: format_date.clone(),
+                    format_date: format_date.clone().or_else(|| clock_config.and_then(|c| c.format_date.clone())),
                 });
             }
             Mode::Timer {

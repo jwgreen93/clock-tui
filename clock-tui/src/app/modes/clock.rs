@@ -1,6 +1,6 @@
 use crate::clock_text::font::bricks::BricksFont;
 use crate::clock_text::ClockText;
-use chrono::{Local, Utc};
+use chrono::{Local, Utc, format::{Item, StrftimeItems}};
 use chrono_tz::Tz;
 use ratatui::{buffer::Buffer, layout::Rect, style::Style, widgets::Widget};
 
@@ -13,7 +13,7 @@ pub(crate) struct Clock {
     pub show_millis: bool,
     pub show_secs: bool,
     pub timezone: Option<Tz>,
-    pub format_date: String,
+    pub format_date: Option<String>,
 }
 
 impl Widget for &Clock {
@@ -35,8 +35,10 @@ impl Widget for &Clock {
         let font = BricksFont::new(self.size);
         let text = ClockText::new(time_str.to_string(), &font, self.style);
         let header = if self.show_date {
-            let mut title = now.format(&self.format_date).to_string();
-            if title == self.format_date {
+            let mut title;
+            if self.format_date.is_some() && !StrftimeItems::new(&self.format_date.as_ref().unwrap()).any(|i| matches!(i, Item::Error)) {
+                title = now.format(&self.format_date.as_ref().unwrap()).to_string();
+            } else {
                 title = now.format("%Y-%m-%d").to_string();
             }
             if let Some(tz) = self.timezone {
