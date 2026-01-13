@@ -13,6 +13,7 @@ pub(crate) struct Clock {
     pub show_millis: bool,
     pub show_secs: bool,
     pub timezone: Option<Tz>,
+    pub format_date: String,
 }
 
 impl Widget for &Clock {
@@ -34,7 +35,10 @@ impl Widget for &Clock {
         let font = BricksFont::new(self.size);
         let text = ClockText::new(time_str.to_string(), &font, self.style);
         let header = if self.show_date {
-            let mut title = now.format("%Y-%m-%d").to_string();
+            let mut title = now.format(&self.format_date).to_string();
+            if title == self.format_date {
+                title = now.format("%Y-%m-%d").to_string();
+            }
             if let Some(tz) = self.timezone {
                 title.push(' ');
                 title.push_str(tz.name());

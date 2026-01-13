@@ -30,6 +30,9 @@ pub enum Mode {
         /// Custome timezone, for example "America/New_York", use local timezone if not specificed
         #[clap(short = 'z', long, value_parser=parse_timezone)]
         timezone: Option<Tz>,
+        /// Custom date format, for example "%a, %d %b %Y", defaults to "%Y-%m-%d"
+        #[clap(short = 'f', long)]
+        format_date: String,
         /// Do not show date
         #[clap(short = 'D', long, action)]
         no_date: bool,
@@ -179,6 +182,7 @@ impl App {
                         millis: clock_config.map(|c| c.show_millis).unwrap_or(false),
                         no_seconds: !clock_config.map(|c| c.show_seconds).unwrap_or(true),
                         timezone: clock_config.and_then(|c| c.timezone),
+                        format_date: clock_config.map(|c| c.format_date.clone()).unwrap_or("%Y-%m-%d".to_string()),
                     }
                 }
             });
@@ -203,12 +207,14 @@ impl App {
             millis: false,
             no_seconds: false,
             timezone: None,
+            format_date: "%Y-%m-%d".to_string(),
         }) {
             Mode::Clock {
                 no_date,
                 no_seconds,
                 millis,
                 timezone,
+                format_date,
             } => {
                 let clock_config = config.as_ref().map(|c| &c.clock);
                 self.clock = Some(Clock {
@@ -218,6 +224,7 @@ impl App {
                     show_millis: *millis || clock_config.map(|c| c.show_millis).unwrap_or(false),
                     show_secs: !no_seconds && clock_config.map(|c| c.show_seconds).unwrap_or(true),
                     timezone: timezone.or_else(|| clock_config.and_then(|c| c.timezone)),
+                    format_date: format_date.clone(),
                 });
             }
             Mode::Timer {

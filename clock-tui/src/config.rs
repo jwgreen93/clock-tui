@@ -46,6 +46,8 @@ pub struct ClockConfig {
     pub show_millis: bool,
     #[serde(default, deserialize_with = "deserialize_timezone")]
     pub timezone: Option<Tz>,
+    #[serde(default = "default_date_format")]
+    pub format_date: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -100,6 +102,7 @@ impl Default for ClockConfig {
             show_seconds: default_true(),
             show_millis: default_false(),
             timezone: None,
+            format_date: default_date_format(),
         }
     }
 }
@@ -158,6 +161,10 @@ fn default_false() -> bool {
 
 fn default_timer_durations() -> Vec<String> {
     vec!["25m".to_string(), "5m".to_string()]
+}
+
+fn default_date_format() -> String {
+    "%Y-%m-%d".to_string()
 }
 
 impl Config {
